@@ -1,96 +1,121 @@
 
 "use client";
 
-import { AuthContext, TUser } from "@/contexts/auth.context";
+import { useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { IoMdHeart } from "react-icons/io";
 import { HiShoppingBag } from "react-icons/hi2";
+import { FiLogOut } from "react-icons/fi";
+
+import { AuthContext } from "@/contexts/auth.context";
+import { getWishlist } from "@/api/wishlist.api";
 import { Role } from "@/types/global.types";
 
 const AuthSection = () => {
-  //* using context
   const { user, isLoading, logout } = useContext(AuthContext);
 
+  const { data } = useQuery({
+    queryKey: ["wishlist"],
+    queryFn: getWishlist,
+    enabled: !!user,
+  });
+
+  const wishlistCount = data?.data?.length || 0;
+
+  // Loading
+  if (isLoading) {
+    return (
+      <p className="text-sm text-gray-400">
+        Loading...
+      </p>
+    );
+  }
+
+  // Not logged in
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href="/login"
+         
+          className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-800"
+        >
+          Login
+        </Link>
+
+        <Link
+          href="/sign-up"
+          className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-800"
+        >
+          Sign Up
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-w-20">
-      {isLoading && <p>Loading</p>}
+    <div className="flex items-center gap-4">
 
-      {!isLoading && user && (
-        <UserProfile user={user} logout={logout} />
-      )}
-
-      {!isLoading && !user && <AuthButtons />}
-    </div>
-  );
-};
-
-const UserProfile = ({
-  user: { full_name, profile_image, role },
-  logout,
-}: {
-  user: TUser;
-  logout: () => void;
-}) => {
-  return (
-    <div className="flex items-center gap-5">
-
-      {/* Icons */}
-      {role !== Role.ADMIN && (
-        <div className="flex items-center gap-3">
+      {/* Wishlist + Cart */}
+      {user.role !== Role.ADMIN && (
+        <div className="flex items-center gap-2">
 
           {/* Wishlist */}
           <Link
-            href="/client/wishlist"
-            className="transition-transform duration-200 hover:scale-110"
+            href="/wishlist"
+            className="relative flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition hover:bg-red-50 hover:text-red-500"
           >
-            <IoMdHeart
-              size={28}
-              className="mt-0.5 text-red-500"
-            />
+            <IoMdHeart size={22} />
+
+            {wishlistCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
 
           {/* Cart */}
           <Link
             href="/cart"
-            className="transition-transform duration-200 hover:scale-110"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition hover:bg-teal-50 hover:text-teal-600"
           >
-            <HiShoppingBag
-              size={26}
-              className="text-primary"
-            />
+            <HiShoppingBag size={22} />
           </Link>
 
         </div>
       )}
 
-      {/* User Profile */}
-      <div className="flex items-center gap-2">
+      {/* Divider */}
+      <div className="h-8 w-px bg-gray-200" />
+
+      {/* Profile */}
+      <div className="flex items-center gap-2.5">
 
         {/* Profile Image */}
-        <div className="h-14 w-14 overflow-hidden rounded-full border border-primary p-0.5">
+        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100">
           <Image
-            src={profile_image?.path ?? "/profile.jpg"}
-            alt="profile image"
-            height={500}
-            width={500}
-            className="h-full w-full rounded-full object-cover"
+            src={user.profile_image?.path || "/profile.jpg"}
+            alt={user.full_name || "Profile"}
+            fill
+            sizes="40px"
+            className="object-cover"
           />
         </div>
 
-        {/* User Info */}
-        <div>
-          {/* Name */}
-          <p className="text-lg font-bold text-primary">
-            {full_name}
+        {/* Name + Logout */}
+        <div className="hidden sm:block">
+          <p className="max-w-32 truncate text-sm font-semibold text-gray-800">
+            {user.full_name}
           </p>
 
-          {/* Logout */}
           <button
+            type="button"
             onClick={logout}
-            className="cursor-pointer text-md font-semibold text-red-500 transition hover:text-red-600"
+            className="flex items-center gap-1 text-xs text-gray-400 transition hover:text-red-500"
           >
+            <FiLogOut size={12} />
             Logout
           </button>
         </div>
@@ -100,45 +125,16 @@ const UserProfile = ({
   );
 };
 
-const AuthButtons = () => {
-  return (
-    <div className="flex gap-3">
-
-      {/* Login */}
-      <Link href="/login">
-        <p
-          className="
-            min-w-30 cursor-pointer rounded-sm
-            bg-teal-500 px-1 py-3
-            text-center font-bold text-white
-            transition-all duration-300
-            hover:bg-teal-400
-            active:bg-teal-600
-          "
-        >
-          Login
-        </p>
-      </Link>
-
-      {/* Sign Up */}
-      <Link href="/login">
-        <p
-          className="
-            min-w-30 cursor-pointer rounded-sm
-            border border-teal-500 px-1 py-3
-            text-center font-bold text-teal-500
-            transition-all duration-300
-            hover:bg-teal-400 hover:text-white
-            active:bg-teal-600
-          "
-        >
-          Sign Up
-        </p>
-      </Link>
-
-    </div>
-  );
-};
-
 export default AuthSection;
+
+
+
+
+
+
+
+
+
+
+
 

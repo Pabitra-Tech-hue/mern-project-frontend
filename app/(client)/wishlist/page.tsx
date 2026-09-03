@@ -8,6 +8,8 @@ import { TbCurrencyRupeeNepalese } from "react-icons/tb";
 import { toast } from "react-hot-toast";
 
 import { getWishlist, removeFromWishlist } from "@/api/wishlist.api";
+import withAuth from "@/hoc/withAuth.hoc";
+import { Role } from "@/types/global.types";
 
 const WishlistPage = () => {
   const queryClient = useQueryClient();
@@ -68,9 +70,7 @@ const WishlistPage = () => {
         <div className="mb-8 text-center">
           <FaHeart className="mx-auto text-4xl text-primary" />
           <h1 className="mt-3 text-3xl font-bold">My Wishlist</h1>
-          <p className="mt-2 text-gray-500">
-            {wishlist.length} products saved
-          </p>
+          <p className="mt-2 text-gray-500">{wishlist.length} products saved</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,9 +100,7 @@ const WishlistPage = () => {
               </div>
 
               <div className="p-4">
-                <h2 className="truncate text-lg font-bold">
-                  {product.name}
-                </h2>
+                <h2 className="truncate text-lg font-bold">{product.name}</h2>
 
                 <div className="mt-2 flex gap-2">
                   {product.brand?.name && (
@@ -136,6 +134,6 @@ const WishlistPage = () => {
     </main>
   );
 };
+const ProtectedWishlistPage = withAuth(WishlistPage, [Role.USER]);
 
-export default WishlistPage;
-
+export default ProtectedWishlistPage;

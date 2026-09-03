@@ -1,10 +1,16 @@
+
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { TbCurrencyRupeeNepalese } from "react-icons/tb";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import {
+  FaHeart,
+  FaRegHeart,
+  FaStar,
+} from "react-icons/fa";
+
 import {
   useMutation,
   useQuery,
@@ -26,7 +32,9 @@ interface IProps {
 const ProductCard = ({ product }: IProps) => {
   const queryClient = useQueryClient();
 
-  // ================= WISHLIST =================
+  // =========================
+  // GET WISHLIST
+  // =========================
 
   const { data } = useQuery({
     queryKey: ["wishlist"],
@@ -39,7 +47,9 @@ const ProductCard = ({ product }: IProps) => {
     (item: TProduct) => item._id === product._id
   );
 
-  // ================= ADD WISHLIST =================
+  // =========================
+  // ADD TO WISHLIST
+  // =========================
 
   const addMutation = useMutation({
     mutationFn: addToWishlist,
@@ -51,7 +61,9 @@ const ProductCard = ({ product }: IProps) => {
     },
   });
 
-  // ================= REMOVE WISHLIST =================
+  // =========================
+  // REMOVE FROM WISHLIST
+  // =========================
 
   const removeMutation = useMutation({
     mutationFn: removeFromWishlist,
@@ -63,7 +75,9 @@ const ProductCard = ({ product }: IProps) => {
     },
   });
 
-  // ================= HANDLE WISHLIST =================
+  // =========================
+  // WISHLIST HANDLER
+  // =========================
 
   const handleWishlist = () => {
     if (isWishlisted) {
@@ -74,22 +88,23 @@ const ProductCard = ({ product }: IProps) => {
   };
 
   return (
-    <div className="group mx-auto w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <div className="group w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
-      {/* ================= IMAGE ================= */}
+      {/* =========================
+          IMAGE
+      ========================= */}
 
-      <div className="relative flex h-[210px] w-full items-center justify-center overflow-hidden bg-gray-50">
+      <div className="relative h-44 w-full overflow-hidden bg-white">
 
         <Image
           src={product.cover_image?.path}
           alt={product.name}
           fill
-          priority
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-contain scale-[1.12] transition-transform duration-500 group-hover:scale-[1.18]"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
 
-        {/* ================= WISHLIST ================= */}
+        {/* WISHLIST */}
 
         <button
           type="button"
@@ -98,12 +113,12 @@ const ProductCard = ({ product }: IProps) => {
             addMutation.isPending ||
             removeMutation.isPending
           }
+          className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm transition-all duration-200 hover:scale-110"
           aria-label={
             isWishlisted
               ? "Remove from wishlist"
               : "Add to wishlist"
           }
-          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md transition-all duration-200 hover:scale-110"
         >
           {isWishlisted ? (
             <FaHeart
@@ -113,79 +128,110 @@ const ProductCard = ({ product }: IProps) => {
           ) : (
             <FaRegHeart
               size={15}
-              className="text-gray-600"
+              className="text-gray-500"
             />
           )}
         </button>
       </div>
 
-      {/* ================= CONTENT ================= */}
+      {/* =========================
+          CONTENT
+      ========================= */}
 
-      <div className="px-4 py-3">
+      <div className="p-3">
 
         {/* PRODUCT NAME */}
 
         <h2
           title={product.name}
-          className="truncate text-[15px] font-semibold leading-5 text-gray-800"
+          className="truncate text-sm font-semibold text-gray-800"
         >
           {product.name}
         </h2>
 
         {/* BRAND + CATEGORY */}
 
-        <div className="mt-2 flex gap-2">
+        <div className="mt-1.5 flex items-center gap-1.5">
 
           {product.brand?.name && (
-            <span
-              title={product.brand.name}
-              className="max-w-[50%] truncate rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-medium text-gray-600"
-            >
+            <span className="max-w-[50%] truncate rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
               {product.brand.name}
             </span>
           )}
 
           {product.category?.name && (
-            <span
-              title={product.category.name}
-              className="max-w-[50%] truncate rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-medium text-gray-600"
-            >
+            <span className="max-w-[50%] truncate rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600">
               {product.category.name}
             </span>
           )}
 
         </div>
 
-        {/* ================= PRICE ================= */}
+        {/* =========================
+            PRICE
+        ========================= */}
 
-        <div className="mt-2 flex items-center gap-1">
+        <div className="mt-2 flex items-center gap-0.5">
 
           <TbCurrencyRupeeNepalese
             size={17}
-            className="text-primary"
+            className="text-orange-500"
           />
 
-          <span className="text-[17px] font-bold text-primary">
+          <span className="text-lg font-bold text-orange-500">
             {product.price}
           </span>
 
         </div>
 
-        {/* ================= DESCRIPTION ================= */}
+        {/* =========================
+            RATING
+        ========================= */}
 
-        <p className="mt-1.5 line-clamp-2 text-[11px] leading-4 text-gray-500">
+        <div className="mt-1.5 flex items-center gap-2">
+
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <FaStar
+                key={star}
+                size={11}
+                className="text-yellow-400"
+              />
+            ))}
+          </div>
+
+          <span className="text-[11px] font-medium text-gray-600">
+            4.5
+          </span>
+
+          <span className="text-[11px] text-gray-400">
+            | 120 Reviews
+          </span>
+
+        </div>
+
+        {/* =========================
+            DESCRIPTION
+        ========================= */}
+
+        <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-gray-500">
           {product.description}
         </p>
 
-        {/* ================= VIEW DETAILS ================= */}
+        {/* =========================
+            VIEW DETAILS
+        ========================= */}
 
         <Link
           href={`/products/${product._id}`}
           className="mt-3 block"
         >
-          <div className="w-full rounded-lg bg-primary py-2.5 text-center text-[11px] font-semibold text-white transition-all duration-200 hover:opacity-90">
+          <button
+            type="button"
+            className="w-full rounded-md border border-gray-300 bg-white py-2 text-xs font-semibold text-gray-700 transition-all duration-200 hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+          >
             View Details
-          </div>
+          </button>
         </Link>
 
       </div>
@@ -194,3 +240,10 @@ const ProductCard = ({ product }: IProps) => {
 };
 
 export default ProductCard;
+
+
+
+
+
+
+

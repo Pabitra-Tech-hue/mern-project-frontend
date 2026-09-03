@@ -7,8 +7,8 @@ import ProductsSection from "@/components/client/landing/products-section";
 import FeaturedProductsSection from "@/components/client/landing/features-products";
 import NewArrivalsProductsSection from "@/components/client/landing/new-arrivals";
 import Footer from "@/components/client/layout/footer";
-import WishlistPage from "./client/wishlist/page";
-import CartPage from "./client/cart/page";
+import WishlistPage from "./(client)/wishlist/page";
+import CartPage from "./(client)/cart/page";
 
 export const metadata: Metadata = {
   title: "Home | Nepali Pasal",
